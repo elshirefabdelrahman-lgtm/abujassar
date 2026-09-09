@@ -28,5 +28,25 @@
     document.querySelectorAll('.final-cta-section, .contact-band, .site-footer').forEach(section => actionObserver.observe(section));
   }
   document.querySelectorAll('[data-faq-button]').forEach(button => button.addEventListener('click', () => { const answer = document.getElementById(button.getAttribute('aria-controls')); const isOpen = button.getAttribute('aria-expanded') === 'true'; button.setAttribute('aria-expanded', String(!isOpen)); if (answer) answer.hidden = isOpen; }));
+  const galleryImages = [...document.querySelectorAll('.gallery-card img')];
+  if (galleryImages.length) {
+    const lightbox = document.createElement('div');
+    lightbox.className = 'site-lightbox';
+    lightbox.setAttribute('role', 'dialog');
+    lightbox.setAttribute('aria-modal', 'true');
+    lightbox.setAttribute('aria-label', 'عرض الصورة بالحجم الكامل');
+    lightbox.innerHTML = '<button class="site-lightbox-close" type="button" aria-label="إغلاق عرض الصورة">×</button><figure><img alt=""><figcaption></figcaption></figure>';
+    document.body.append(lightbox);
+    const preview = lightbox.querySelector('img');
+    const caption = lightbox.querySelector('figcaption');
+    const closeButton = lightbox.querySelector('button');
+    let activeImage = null;
+    const closeLightbox = () => { if (!lightbox.classList.contains('is-open')) return; lightbox.classList.remove('is-open'); document.body.classList.remove('lightbox-open'); activeImage?.focus(); };
+    const openLightbox = image => { activeImage = image; preview.src = image.currentSrc || image.src; preview.alt = image.alt; caption.textContent = image.closest('figure')?.querySelector('figcaption')?.textContent || image.alt; lightbox.classList.add('is-open'); document.body.classList.add('lightbox-open'); closeButton.focus(); };
+    galleryImages.forEach(image => { image.tabIndex = 0; image.setAttribute('role', 'button'); image.setAttribute('aria-label', `تكبير الصورة: ${image.alt}`); image.addEventListener('click', () => openLightbox(image)); image.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openLightbox(image); } }); });
+    closeButton.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', event => { if (event.target === lightbox) closeLightbox(); });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape') closeLightbox(); });
+  }
   document.querySelectorAll('[data-current-year]').forEach(element => { element.textContent = new Date().getFullYear(); });
 })();

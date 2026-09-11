@@ -2,7 +2,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 
 const root = process.cwd();
-const required = ['index.html', '404.html', 'css/style.css', 'js/main.js', 'images/hero-حداد-مكة-ابو-جسار.webp', 'robots.txt', 'sitemap.xml'];
+const required = ['index.html', '404.html', 'css/style.css', 'js/main.js', 'images/favicon-48.png', 'images/apple-touch-icon.png', 'images/abu-jassar-logo-512.png', 'images/hero-حداد-مكة-ابو-جسار.webp', 'robots.txt', 'sitemap.xml'];
 const missingRequired = required.filter(file => !existsSync(join(root, file)));
 if (missingRequired.length) throw new Error(`Missing required files: ${missingRequired.join(', ')}`);
 
@@ -115,6 +115,8 @@ for (const file of [...htmlFiles, join(root, 'scripts/build.mjs'), join(root, 's
 }
 if (!homepage.includes('<!-- Google Search Console verification: insert real token here -->')) issues.push('Homepage is missing the Search Console placeholder');
 if (!homepage.includes(expectedEmail)) issues.push('Homepage is missing the canonical email link');
+if (!homepage.includes('./images/favicon-48.png') || !homepage.includes('./images/apple-touch-icon.png')) issues.push('Homepage is missing PNG favicon declarations');
+if (!homepage.includes('https://www.abujassar.com/images/abu-jassar-logo-512.png')) issues.push('Homepage schema is missing the crawlable PNG business logo');
 if (!homepage.includes(`href="${reviewUrl}" target="_blank" rel="noopener noreferrer"`)) issues.push('Homepage is missing the safe Google review CTA');
 if ((homepage.match(new RegExp(reviewUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) ?? []).length !== 1) issues.push('Homepage must contain exactly one Google review URL');
 if (homepage.includes('aggregateRating') || homepage.includes('ratingValue') || homepage.includes('reviewCount')) issues.push('Homepage contains unsupported rating schema');

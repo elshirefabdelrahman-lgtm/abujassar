@@ -16,7 +16,10 @@ const descriptions = new Map();
 const canonicals = new Map();
 const expectedPhone = 'tel:+966506008916';
 const expectedWhatsApp = 'https://wa.me/966506008916';
-const expectedEmail = 'mailto:abo053jasr@gmail.com';
+const expectedEmail = 'mailto:abugassar677@gmail.com';
+const retiredEmail = ['abo053jasr', 'gmail.com'].join('@');
+const officialOrigin = 'https://www.abujassar.com';
+const reviewUrl = 'https://g.page/r/CTEQ6wdCKJFgEBM/review';
 
 const one = (html, pattern) => html.match(pattern)?.[1]?.trim() ?? '';
 const remember = (map, value, file, label) => {
@@ -78,7 +81,7 @@ for (const file of htmlFiles) {
     indexable.push({ file, name, html, canonical });
     if (!canonical) issues.push(`${name}: indexable page missing canonical`);
     const route = name === 'index.html' ? '' : `${dirname(name).split(sep).join('/')}/`;
-    const expectedCanonical = `https://abujassar.com/${route}`;
+    const expectedCanonical = `${officialOrigin}/${route}`;
     if (canonical !== expectedCanonical) issues.push(`${name}: canonical must match its route (${expectedCanonical})`);
     remember(canonicals, canonical, file, 'canonical');
     for (const property of ['og:type', 'og:locale', 'og:title', 'og:description', 'og:url', 'og:image']) {
@@ -104,11 +107,17 @@ if (sitemap.includes('404')) issues.push('sitemap.xml must not include the 404 p
 
 const robotsText = readFileSync(join(root, 'robots.txt'), 'utf8');
 if (!/^User-agent:\s*\*/mi.test(robotsText) || !/^Allow:\s*\/$/mi.test(robotsText)) issues.push('robots.txt must allow crawling');
-if (!robotsText.includes('Sitemap: https://abujassar.com/sitemap.xml')) issues.push('robots.txt has an incorrect sitemap reference');
+if (!robotsText.includes('Sitemap: https://www.abujassar.com/sitemap.xml')) issues.push('robots.txt has an incorrect sitemap reference');
 
 const homepage = readFileSync(join(root, 'index.html'), 'utf8');
+for (const file of [...htmlFiles, join(root, 'scripts/build.mjs'), join(root, 'sitemap.xml'), join(root, 'robots.txt')]) {
+  if (readFileSync(file, 'utf8').includes(retiredEmail)) issues.push(`${relative(root, file)}: old business email is still present`);
+}
 if (!homepage.includes('<!-- Google Search Console verification: insert real token here -->')) issues.push('Homepage is missing the Search Console placeholder');
 if (!homepage.includes(expectedEmail)) issues.push('Homepage is missing the canonical email link');
+if (!homepage.includes(`href="${reviewUrl}" target="_blank" rel="noopener noreferrer"`)) issues.push('Homepage is missing the safe Google review CTA');
+if ((homepage.match(new RegExp(reviewUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) ?? []).length !== 1) issues.push('Homepage must contain exactly one Google review URL');
+if (homepage.includes('aggregateRating') || homepage.includes('ratingValue') || homepage.includes('reviewCount')) issues.push('Homepage contains unsupported rating schema');
 if (!homepage.includes('./css/style.css') || !homepage.includes('./js/main.js') || !homepage.includes('./images/hero-حداد-مكة-ابو-جسار.webp')) issues.push('Homepage static asset references are incomplete');
 if (!readFileSync(join(root, 'css/style.css'), 'utf8').includes('prefers-reduced-motion')) issues.push('CSS is missing prefers-reduced-motion support');
 

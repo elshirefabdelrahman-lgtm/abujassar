@@ -14,10 +14,16 @@ const indexable = [];
 const titles = new Map();
 const descriptions = new Map();
 const canonicals = new Map();
-const expectedPhone = 'tel:+966506008916';
-const expectedWhatsApp = 'https://wa.me/966506008916';
-const expectedEmail = 'mailto:abugassar677@gmail.com';
-const retiredEmail = ['abo053jasr', 'gmail.com'].join('@');
+const expectedPhone = 'tel:+966558692701';
+const expectedWhatsApp = 'https://wa.me/966558692701';
+const expectedEmail = 'mailto:abuaedhmohmmad16@gmail.com';
+const retiredContacts = [
+  ['abo053jasr', 'gmail.com'].join('@'),
+  ['abugassar677', 'gmail.com'].join('@'),
+  ['+966', '50', '600', '8916'].join(''),
+  ['050', '600', '8916'].join(' '),
+  ['050', '600', '8916'].join('')
+];
 const officialOrigin = 'https://www.abujassar.com';
 const reviewUrl = 'https://g.page/r/CTEQ6wdCKJFgEBM/review';
 
@@ -111,7 +117,10 @@ if (!robotsText.includes('Sitemap: https://www.abujassar.com/sitemap.xml')) issu
 
 const homepage = readFileSync(join(root, 'index.html'), 'utf8');
 for (const file of [...htmlFiles, join(root, 'scripts/build.mjs'), join(root, 'sitemap.xml'), join(root, 'robots.txt')]) {
-  if (readFileSync(file, 'utf8').includes(retiredEmail)) issues.push(`${relative(root, file)}: old business email is still present`);
+  const source = readFileSync(file, 'utf8');
+  for (const retiredContact of retiredContacts) {
+    if (source.includes(retiredContact)) issues.push(`${relative(root, file)}: old business contact is still present`);
+  }
 }
 if (!homepage.includes('<!-- Google Search Console verification: insert real token here -->')) issues.push('Homepage is missing the Search Console placeholder');
 if (!homepage.includes(expectedEmail)) issues.push('Homepage is missing the canonical email link');

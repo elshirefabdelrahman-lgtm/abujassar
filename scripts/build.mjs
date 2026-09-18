@@ -25,7 +25,7 @@ const retiredContacts = [
   ['050', '600', '8916'].join('')
 ];
 const officialOrigin = 'https://www.abujassar.com';
-const reviewUrl = 'https://g.page/r/CTEQ6wdCKJFgEBM/review';
+const reviewUrl = 'https://g.page/r/CSdjT_FpBmr8ECE/review';
 
 const one = (html, pattern) => html.match(pattern)?.[1]?.trim() ?? '';
 const remember = (map, value, file, label) => {
